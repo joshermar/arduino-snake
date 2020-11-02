@@ -18,7 +18,6 @@ typedef enum {
 
 
 #include <TVout.h>
-#include <fontALL.h>
 
 // Game paremeters
 #define MAX_LEN        140 // 150 ish appears to be the practical limit on the atmega328p
@@ -83,12 +82,17 @@ struct Segment food;
 void setup()  {
   randomSeed(analogRead(A5));
   tv.begin(NTSC);
-  tv.select_font(font6x8);
+
+  tv.clear_screen();
+  tv.draw_rect(X_LOWER_BOUND, Y_LOWER_BOUND, X_GAME_SIZE+1, Y_GAME_SIZE+1, WHITE, WHITE);
 }
 
 
 void loop() {
-  message_screen("ARDUINO SNAKE\n", "PRESS START");
+  
+  tv.delay(1000);
+  while(!get_input())
+    ;
 
   tv.clear_screen();
   tv.draw_rect(X_LOWER_BOUND, Y_LOWER_BOUND, X_GAME_SIZE+1, Y_GAME_SIZE+1, WHITE, BLACK);
@@ -98,20 +102,6 @@ void loop() {
     poll_input(MOV_DELAY);
   }
 }
-
-
-void message_screen(char * line1, char * line2) {
-  /* Takes two string args in order to provide a slight delay between first and second */
-  tv.clear_screen();
-  tv.println(line1);
-  tv.delay(500);
-  tv.println(line2);
-  tv.delay(500); 
-
-  while(!get_input())
-  ;
-}
-
 
 void draw_food(struct Segment f) {
   tv.set_pixel(f.x, f.y+2, WHITE);
@@ -248,9 +238,6 @@ bool try_movement() {
 
   // Game over
   if(brdr_col(test_seg.x, test_seg.y) || snake_collision(test_seg.x, test_seg.y)) {
-    char score_msg[18];
-    sprintf(score_msg, "FINAL LENGTH: %d", snake.len);
-    message_screen("GAME OVER\n", score_msg);
     return false;
   }
 
@@ -259,7 +246,6 @@ bool try_movement() {
   
     // Game won
     if(snake.len == MAX_LEN) {
-      message_screen("YOU WIN", "");
       return false;
     }
     
