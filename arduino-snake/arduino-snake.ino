@@ -1,3 +1,22 @@
+/* Refactoring TODO:
+
+-Replace "byte" with "uint8_t"
+
+-Look into naming of "initialize_game". Probably should be "initialize_snake",
+and place_food should be called separately.
+
+-Replace cardinal direction constants with an enum:
+typedef enum {
+  NO_DIR,
+  NORTH,
+  EAST,
+  SOUTH,
+  WEST,
+} direction;
+
+*/
+
+
 #include <TVout.h>
 #include <fontALL.h>
 
