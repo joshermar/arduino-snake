@@ -1,13 +1,10 @@
 /* Refactoring TODO:
 
--Move macros and struct definitions into a header file
+-Move macros and struct definitions into a header file <<DONE>>
 
--Replace "byte" with "uint8_t"
+-Replace "byte" with "uint8_t" <<DONE>>
 
--Look into naming of "initialize_game". Probably should be "initialize_snake",
-and place_food should be called separately.
-
--Replace cardinal direction constants with an enum:
+-Replace cardinal direction constants with an enum: <<DONE>>
 typedef enum {
   NO_DIR,
   NORTH,
@@ -15,6 +12,9 @@ typedef enum {
   SOUTH,
   WEST,
 } direction;
+
+-Look into naming of "initialize_game". Probably should be "initialize_snake",
+and place_food should be called separately.
 
 */
 
@@ -62,7 +62,7 @@ void draw_food(struct Segment f) {
 void initialize_game() {
   /* Initialize snake and place at starting location */
   snake.len = START_LEN;
-  snake.direction = WEST;
+  snake.dir = WEST;
   snake.tail_idx = 0;
 
   for(int i=0; i<START_LEN; i++) {
@@ -77,7 +77,7 @@ void initialize_game() {
 
 void place_food() {
   unsigned int ran_pos = random(TOT_GRID_SZE);
-  byte x_try, y_try;
+  uint8_t x_try, y_try;
   do {
     x_try = ran_pos % X_GRID_SZE * BLOCK_LEN + X_OFFSET;
     y_try = ran_pos / Y_GRID_SZE * BLOCK_LEN + Y_OFFSET;
@@ -93,7 +93,7 @@ void place_food() {
 }
 
 
-byte get_input() {
+direction get_input() {
   if (analogRead(JOY_Y_PIN) < ANALOG_LOW)
     return NORTH;
   if (analogRead(JOY_X_PIN) < ANALOG_LOW)
@@ -106,17 +106,17 @@ byte get_input() {
 }
 
 
-void poll_input(byte interval) {
+void poll_input(uint8_t interval) {
     /* Check for input multiple (INPUT_SAMPLES) times per interval */
 
-    byte sub_interval = interval / INPUT_SAMPLES;
-    byte input;
+    uint8_t sub_interval = interval / INPUT_SAMPLES;
+    uint8_t input;
 
     for(int i=0; i<INPUT_SAMPLES; i++) {
       input = get_input();
 
       if(valid_dir(input)) {
-        snake.direction = input;
+        snake.dir = input;
         tv.delay(interval);
         return;
       }
@@ -128,8 +128,8 @@ void poll_input(byte interval) {
 
 void get_next_position(struct Segment *new_seg) {
   /* Sets a segment to the next logical position based on snake direction */
-  byte head_idx = (snake.len + snake.tail_idx - 1) % snake.len;
-  switch (snake.direction) {
+  uint8_t head_idx = (snake.len + snake.tail_idx - 1) % snake.len;
+  switch (snake.dir) {
   case NORTH:
     new_seg->x = snake.body[head_idx].x;
     new_seg->y = snake.body[head_idx].y - BLOCK_LEN;
@@ -150,7 +150,7 @@ void get_next_position(struct Segment *new_seg) {
 }
 
 
-bool snake_collision(byte test_x, byte test_y) {
+bool snake_collision(uint8_t test_x, uint8_t test_y) {
   for(int i=0; i<snake.len; i++) {
     if(snake.body[i].x == test_x && snake.body[i].y == test_y) {
       return true;
