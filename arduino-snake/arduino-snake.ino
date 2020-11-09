@@ -10,14 +10,12 @@ struct Segment food;
 void setup()  {
   randomSeed(analogRead(A5));
   tv.begin(NTSC);
-
   tv.clear_screen();
   tv.draw_rect(X_LOWER_BOUND, Y_LOWER_BOUND, X_GAME_SIZE+1, Y_GAME_SIZE+1, WHITE, WHITE);
 }
 
 
 void loop() {
-  
   tv.delay(1000);
   while(!get_input())
     ;
@@ -32,6 +30,7 @@ void loop() {
     poll_input(MOV_DELAY);
   }
 }
+
 
 void draw_food(struct Segment f) {
   tv.set_pixel(f.x, f.y+2, WHITE);
@@ -85,8 +84,8 @@ direction get_input() {
 }
 
 
+/* Check for input multiple (INPUT_SAMPLES) times per interval */
 void poll_input(uint8_t interval) {
-    /* Check for input multiple (INPUT_SAMPLES) times per interval */
 
     uint8_t sub_interval = interval / INPUT_SAMPLES;
     uint8_t input;
@@ -105,8 +104,8 @@ void poll_input(uint8_t interval) {
 }
 
 
+/* Sets a segment to the next logical position based on snake direction */
 void get_next_position(struct Segment *new_seg) {
-  /* Sets a segment to the next logical position based on snake direction */
   uint8_t head_idx = (snake.len + snake.tail_idx - 1) % snake.len;
   switch (snake.dir) {
   case NORTH:
@@ -159,8 +158,8 @@ void grow_snake(struct Segment new_head) {
 }
 
 
+/* Returns false on game over, true otherwise */
 bool try_movement() {
-  /* Returns false on game over, true otherwise */
   struct Segment test_seg;
   get_next_position(&test_seg);
 
