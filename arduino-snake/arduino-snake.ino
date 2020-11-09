@@ -10,8 +10,7 @@ struct Segment food;
 void setup()  {
   randomSeed(analogRead(A5));
   tv.begin(NTSC);
-  tv.clear_screen();
-  tv.draw_rect(X_LOWER_BOUND, Y_LOWER_BOUND, X_GAME_SIZE+1, Y_GAME_SIZE+1, WHITE, WHITE);
+  draw_white_screen();
 }
 
 
@@ -20,22 +19,11 @@ void loop() {
   while(!get_input())
     ;
 
-  tv.clear_screen();
-  tv.draw_rect(X_LOWER_BOUND, Y_LOWER_BOUND, X_GAME_SIZE+1, Y_GAME_SIZE+1, WHITE, BLACK);
-  
+  draw_game_screen();
   init_snake();
   place_food();
-
-  while(try_movement()) {
-    poll_input(MOV_DELAY);
-  }
-}
-
-
-void draw_food(struct Segment f) {
-  tv.set_pixel(f.x, f.y+2, WHITE);
-  tv.set_pixel(f.x+1, f.y+1, WHITE);
-  tv.set_pixel(f.x+2, f.y+2, WHITE);
+  while(snake_loop())
+    ;
 }
 
 
@@ -53,6 +41,7 @@ void init_snake() {
 }
 
 
+/* Randomly place food somewhere that is NOT occupied by snake */
 void place_food() {
   unsigned int ran_pos = random(TOT_GRID_SZE);
   uint8_t x_try, y_try;
@@ -98,6 +87,7 @@ void poll_input(uint8_t interval) {
         tv.delay(interval);
         return;
       }
+
     interval -= sub_interval;
     tv.delay(sub_interval);
     }
@@ -138,7 +128,7 @@ bool snake_collision(uint8_t test_x, uint8_t test_y) {
 }
 
 
-void move_snake(struct Segment new_head) {
+void advance_snake(struct Segment new_head) {
   draw_seg(new_head);
   undraw_seg(snake.body[snake.tail_idx]);
 
@@ -159,19 +149,27 @@ void grow_snake(struct Segment new_head) {
 
 
 /* Returns false on game over, true otherwise */
-bool try_movement() {
+bool snake_loop() {
   struct Segment test_seg;
+
+  // Poll for input and determine proposed position
+  poll_input(MOV_DELAY);
   get_next_position(&test_seg);
 
-  // Game over
-  if(brdr_col(test_seg.x, test_seg.y) || snake_collision(test_seg.x, test_seg.y)) {
+  // Tried to eat wall
+  if(brdr_col(test_seg.x, test_seg.y)) {
+    return false;
+  }
+
+  // Tried to eat self
+  if(snake_collision(test_seg.x, test_seg.y)) {
     return false;
   }
 
   // Ate food
   if(test_seg.x == food.x && test_seg.y == food.y) {
   
-    // Game won
+    // Limit reached
     if(snake.len == MAX_LEN) {
       return false;
     }
@@ -181,6 +179,6 @@ bool try_movement() {
     return true;
   }
 
-  move_snake(test_seg);
+  advance_snake(test_seg);
   return true;
 }

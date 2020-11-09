@@ -30,11 +30,27 @@
 #define ANALOG_HIGH    724 // Upper threshold
 #define INPUT_SAMPLES  8   // Number of times to check for input per iteration
 
-// Simple macro functions
+// Screen drawing macros
+#define draw_white_screen() {\
+  tv.clear_screen();\
+  tv.draw_rect(X_LOWER_BOUND, Y_LOWER_BOUND, X_GAME_SIZE+1, Y_GAME_SIZE+1, WHITE, WHITE);\
+}
+#define draw_game_screen() {\
+  tv.clear_screen();\
+  tv.draw_rect(X_LOWER_BOUND, Y_LOWER_BOUND, X_GAME_SIZE+1, Y_GAME_SIZE+1, WHITE, BLACK);\
+}
+#define draw_food(f) {\
+  tv.set_pixel(f.x, f.y+2, WHITE);\
+  tv.set_pixel(f.x+1, f.y+1, WHITE);\
+  tv.set_pixel(f.x+2, f.y+2, WHITE);\
+}
 #define draw_seg(s)    tv.draw_rect(s.x, s.y, (BLOCK_LEN - 1), (BLOCK_LEN - 1), WHITE, WHITE)
 #define undraw_seg(s)  tv.draw_rect(s.x, s.y, (BLOCK_LEN - 1), (BLOCK_LEN - 1), BLACK, BLACK)
+
+// Additional convenience macros
 #define valid_dir(d)   (d && d != snake.dir && (d+5) % 4 + 1 != snake.dir)
-#define brdr_col(X, Y) (X <= X_LOWER_BOUND || X >= X_UPPER_BOUND || Y <= Y_LOWER_BOUND || Y >= Y_UPPER_BOUND)
+#define brdr_col(X, Y) (X <= X_LOWER_BOUND || X >= X_UPPER_BOUND || \
+                        Y <= Y_LOWER_BOUND || Y >= Y_UPPER_BOUND)
 
 typedef enum {
   NORTH = 1,
