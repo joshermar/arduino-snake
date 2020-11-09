@@ -40,7 +40,7 @@ void draw_food(struct Segment f) {
 }
 
 
-/* Initialize snake object and place at starting position */
+/* Initialize snake at starting position */
 void initialize_snake() {
   snake.len = START_LEN;
   snake.dir = WEST;
