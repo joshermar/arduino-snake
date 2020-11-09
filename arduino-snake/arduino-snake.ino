@@ -1,24 +1,3 @@
-/* Refactoring TODO:
-
--Move macros and struct definitions into a header file <<DONE>>
-
--Replace "byte" with "uint8_t" <<DONE>>
-
--Replace cardinal direction constants with an enum: <<DONE>>
-typedef enum {
-  NO_DIR,
-  NORTH,
-  EAST,
-  SOUTH,
-  WEST,
-} direction;
-
--Look into naming of "initialize_game". Probably should be "initialize_snake",
-and place_food should be called separately.
-
-*/
-
-
 #include <TVout.h>
 #include "arduino-snake.h"
 
@@ -45,7 +24,9 @@ void loop() {
 
   tv.clear_screen();
   tv.draw_rect(X_LOWER_BOUND, Y_LOWER_BOUND, X_GAME_SIZE+1, Y_GAME_SIZE+1, WHITE, BLACK);
-  initialize_game();
+  
+  initialize_snake();
+  place_food();
 
   while(try_movement()) {
     poll_input(MOV_DELAY);
@@ -59,8 +40,8 @@ void draw_food(struct Segment f) {
 }
 
 
-void initialize_game() {
-  /* Initialize snake and place at starting location */
+/* Initialize snake object and place at starting position */
+void initialize_snake() {
   snake.len = START_LEN;
   snake.dir = WEST;
   snake.tail_idx = 0;
@@ -70,8 +51,6 @@ void initialize_game() {
     snake.body[i].y = TAIL_STRT_Y;
     draw_seg(snake.body[i]);
   }
-
-  place_food();
 }
 
 
