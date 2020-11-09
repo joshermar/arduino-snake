@@ -25,7 +25,7 @@ void loop() {
   tv.clear_screen();
   tv.draw_rect(X_LOWER_BOUND, Y_LOWER_BOUND, X_GAME_SIZE+1, Y_GAME_SIZE+1, WHITE, BLACK);
   
-  initialize_snake();
+  init_snake();
   place_food();
 
   while(try_movement()) {
@@ -41,7 +41,7 @@ void draw_food(struct Segment f) {
 
 
 /* Initialize snake at starting position */
-void initialize_snake() {
+void init_snake() {
   snake.len = START_LEN;
   snake.dir = WEST;
   snake.tail_idx = 0;
